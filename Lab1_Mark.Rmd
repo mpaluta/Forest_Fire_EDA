@@ -31,6 +31,8 @@ sum(is.na(ff$X))
 sum(is.na(ff$Y))
 ```
 
+# test
+
 Plotting the coordinates on a grid, we can see that some areas of the grid are densely populated with data and other areas are sparse. The colors represent size of the fire.
 
 ```{r}
