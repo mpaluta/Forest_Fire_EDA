@@ -1,0 +1,54 @@
+---
+title: "Lab1_Mark"
+author: "Mark Paluta"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+ff <- read.csv("forestfires.csv", header = TRUE)
+```
+
+# Area
+
+Area appears to be right-skewed. A log transformation gives helps normalize the data.
+
+```{r}
+ff$logArea = log(ff$area)
+hist(ff$area)
+hist(ff$logArea)
+```
+
+# Spatial coordinates
+
+The X and Y coordinates have no missing values.
+
+```{r}
+sum(is.na(ff$X))
+sum(is.na(ff$Y))
+```
+
+Plotting the coordinates on a grid, we can see that some areas of the grid are densely populated with data and other areas are sparse. The colors represent size of the fire.
+
+```{r}
+# filler - define a factor for category of fire
+ff$fire_size <- cut(ff$area, breaks=3, labels=c('Low','Medium','High'))
+plot(jitter(ff$X), jitter(ff$Y), col=ff$fire_size)
+legend(1,9,unique(ff$fire_size),col=1:length(ff$fire_size),pch=1)
+```
+
+# Month
+
+A histogram shows that most of the data comes from spring and summer months. We can use box plots of month and log of area to see the distributions of burned area by month.
+
+```{r}
+ff$month = factor(ff$month,levels(ff$month)[c(5,4,8,1,9,7,6,2,12,11,10,3)])
+barplot(table(ff$month))
+library(ggplot2)
+ggplot(data = ff, aes(x = month, y = logArea)) + geom_boxplot(aes(fill = logArea), width = 0.8) + theme_bw()
+```
+
+
