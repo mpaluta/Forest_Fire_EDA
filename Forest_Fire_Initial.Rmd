@@ -133,3 +133,92 @@ barplot(table(forest_fire$month))
 library(ggplot2)
 ggplot(data = forest_fire, aes(x = month, y = logArea)) + geom_boxplot(aes(fill = logArea), width = 0.8) + theme_bw()
 ```
+
+
+## Introduction
+
+In some areas, forest fires are a major environmental concern, endangering human lives and causing substantial
+economic damage. This analysis is motivated by the following research question:What factors lead to particularly damaging forest fires? 
+
+## Setup
+First we load the car library which gives us a convenient scatterplotMatrix function.
+```{r car}
+library(car)
+```
+
+#Data Selection
+
+```{r}
+#We note that we have 517 observations and 13 variables
+nrow(forestfires)
+
+```
+```{r}
+str(forestfires)
+```
+
+Looking at the rain and area variable, we notice that there are mostly 0's.
+
+# Look at the summary of statistics for the forestfires
+```{r}
+summary(forestfires)
+```
+#Lets look at the summary of area 
+```{r}
+summary(forestfires$area)
+```
+
+Area seems to be right skewed. So to normalize the data, we are taking log of area
+
+```{r}
+forestfires$logarea = log(forestfires$area)
+hist(forestfires$area)
+hist(forestfires$logarea)
+```
+
+#Exploratory Analaysis
+
+We have a large number of variables, we begin with a scatterplot matrix. This is helpful for getting
+a high-level overview of the relationships between our variables and can draw our attention to important
+features we want to investigate further.
+
+```{r}
+#scatterplotMatrix(~ RH + wind + rain + logarea, data=forestfires, smooth = TRUE, main = "Scatterplot Matrix for Relative Humidity, Wind and Rain")
+```
+
+
+#create histogram of wind
+```{r}
+summary(forestfires$wind)
+
+hist(forestfires$wind,breaks=seq(0.4,9.4,0.5),main = "Wind Speed",xlab= NULL)
+```
+Visually, the histogram seems to have a positive skew (right skew). This means that there are
+observations stretching further to the right of the bulk of the data. Note from summary that the mean is greater
+than the median, which is typically what we see for positively skewed variables.
+
+#create histogram of Relative hUmidity
+```{r}
+summary(forestfires$RH)
+hist(forestfires$RH,breaks=seq(15,100,5),main = "Percentage of Relative Humidity",xlab= "RH in %")
+```
+Visually, the histogram seems to have a positive skew (right skew) again. This means that there are
+observations stretching further to the right of the bulk of the data. Note from summary that the mean is greater
+than the median, which is typically what we see for positively skewed variables.
+
+We next examine our Rain variable
+
+#create histogram of Rain 
+```{r}
+summary(forestfires$rain)
+hist(forestfires$rain, breaks=seq(0.0,6.4,0.2), main = "Outside rain in mm/m2", xlab = "Rain in mm/m2" )
+```
+
+
+
+It almost seems like that distribution is spiked at around zero, which means that there was no rain at all.
+
+#boxplot
+```{r}
+#boxplot(rain ~ RH ~ logarea, data = forestfires)
+```
