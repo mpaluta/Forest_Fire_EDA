@@ -1,0 +1,96 @@
+---
+title: "Forest_Fire_Initial"
+author: "Debalina Maiti"
+date: "5/24/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This analysis is motivated by the following research question:
+
+\begin{center}
+What factors lead to particularly damaging forest fires?
+\end{center}
+
+## Setup
+
+First, we load the car library, which gives us a convenient scatterplotMatrix function.
+
+```{r car}
+library(car)
+```
+
+```{r loading}
+# Load the data 
+setwd("/Users/debalinamaiti/Documents/GraduateStudy/MIDS/W203/Unit4/HomeWork/Forest_Fire_EDA")
+
+read.csv("forestfires.csv")
+forest_fire = read.table("forestfires.csv", header=TRUE, sep=",", na.string = "na")
+```
+
+## Data Overview
+
+
+```{r shape}
+nrow(forest_fire)
+str(forest_fire)
+forest_fire
+```
+
+# Data Arrangement
+===================
+We will try to make different type of data transformations for our analysis
+
+#ff_level
+We will add a new column called 'level', to the data frame. And will name this new data frame as ff_level
+This level column will contain the value: high, medium and low
+For the rows with area = 0, we will populate the level value as 'low'
+For the rows with 0 < area < 12.85, we will populate the level value as 'medium'
+For the rows with area >= 12.85, we will populate the level value as 'high'
+#--
+
+```{r}
+
+## Case High
+
+case_high = subset(forest_fire, 12.85<=forest_fire$area &!is.na(forest_fire$area))
+case_high["level"]<- "high"
+
+nrow(case_high)##high count = 76
+
+## Case Medium
+
+case_medium = subset(forest_fire, 0<forest_fire$area & forest_fire$area<12.85 &!is.na(forest_fire$area))
+case_medium["level"]<- "medium"
+
+nrow(case_medium)##medium count = 194
+
+## Case Low
+
+case_low = subset(forest_fire, forest_fire$area==0 &!is.na(forest_fire$area))
+case_low["level"]<- "low"
+
+nrow(case_low)##low count = 247
+
+###Merge all three to ff_level
+
+ff_level = merge(case_high, case_medium, all = TRUE)
+ff_level = merge(case_low, ff_level, all = TRUE)
+
+####Logerithm - looking at the data against area we see that there are huge number of data with value zero. So will replace area value with log(area) value
+#
+ff_level$area = log(ff_level$area)
+str(ff_level)
+```
+
+#Plot X, Y 
+```{r}
+plot(jitter(ff_level$X, factor=2),jitter(ff_level$Y, factor=2 ), col = factor(ff_level$level))
+legend(1, legend=levels(factor(ff_level$level)), col= factor(ff_level$level))
+legend=levels(ff_level$level)
+```
