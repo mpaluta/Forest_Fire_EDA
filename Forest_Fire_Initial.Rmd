@@ -1,6 +1,6 @@
 ---
 title: "Forest_Fire_Initial"
-author: "Debalina Maiti"
+author: "Debalina Maiti, Mark Paluta, Tina Agarwal, Vivek Agarwal"
 date: "5/24/2018"
 output: pdf_document
 ---
@@ -25,10 +25,8 @@ First, we load the car library, which gives us a convenient scatterplotMatrix fu
 library(car)
 ```
 
-```{r loading}
+```{r, results='hide'}
 # Load the data 
-setwd("/Users/debalinamaiti/Documents/GraduateStudy/MIDS/W203/Unit4/HomeWork/Forest_Fire_EDA")
-
 read.csv("forestfires.csv")
 forest_fire = read.table("forestfires.csv", header=TRUE, sep=",", na.string = "na")
 ```
@@ -39,7 +37,7 @@ forest_fire = read.table("forestfires.csv", header=TRUE, sep=",", na.string = "n
 ```{r shape}
 nrow(forest_fire)
 str(forest_fire)
-forest_fire
+# forest_fire
 ```
 
 # Data Arrangement
@@ -88,9 +86,50 @@ ff_level$area = log(ff_level$area)
 str(ff_level)
 ```
 
-#Plot X, Y 
+<!-- #Plot X, Y  -->
+<!-- ```{r} -->
+<!-- plot(jitter(ff_level$X, factor=2),jitter(ff_level$Y, factor=2 ), col = factor(ff_level$level)) -->
+<!-- legend(1, legend=levels(factor(ff_level$level)), col= factor(ff_level$level)) -->
+<!-- legend=levels(ff_level$level) -->
+<!-- ``` -->
+
+# Area
+
+Area appears to be right-skewed. A log transformation helps normalize the data.
+
 ```{r}
-plot(jitter(ff_level$X, factor=2),jitter(ff_level$Y, factor=2 ), col = factor(ff_level$level))
-legend(1, legend=levels(factor(ff_level$level)), col= factor(ff_level$level))
-legend=levels(ff_level$level)
+forest_fire$logArea = log(forest_fire$area)
+hist(forest_fire$area)
+hist(forest_fire$logArea)
+```
+
+# Spatial coordinates
+
+The X and Y coordinates have no missing values.
+
+```{r}
+sum(is.na(forest_fire$X))
+sum(is.na(forest_fire$Y))
+```
+
+# test
+
+Plotting the coordinates on a grid, we can see that some areas of the grid are densely populated with data and other areas are sparse. The colors represent size of the fire.
+
+```{r}
+# filler - define a factor for category of fire
+forest_fire$fire_size <- cut(forest_fire$area, breaks=3, labels=c('Low','Medium','High'))
+plot(jitter(forest_fire$X), jitter(forest_fire$Y), col=forest_fire$fire_size)
+legend(1,9,unique(forest_fire$fire_size),col=1:length(forest_fire$fire_size),pch=1)
+```
+
+# Month
+
+A histogram shows that most of the data comes from spring and summer months. We can use box plots of month and log of area to see the distributions of burned area by month.
+
+```{r}
+forest_fire$month = factor(forest_fire$month,levels(forest_fire$month)[c(5,4,8,1,9,7,6,2,12,11,10,3)])
+barplot(table(forest_fire$month))
+library(ggplot2)
+ggplot(data = forest_fire, aes(x = month, y = logArea)) + geom_boxplot(aes(fill = logArea), width = 0.8) + theme_bw()
 ```
