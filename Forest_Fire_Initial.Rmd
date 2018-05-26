@@ -325,11 +325,9 @@ plot(forest_fire$month, forest_fire$temp)
 
 ```
 
-
-
 ```{r}
 
-scatterplotMatrix(~RH+FFMC+DMC+ISI+DC+month, data=forest_fire)
+scatterplotMatrix(~RH+FFMC+DMC+ISI+DC+month, data=forest_fire)  
 
 ```
 # Analysis of Key Relationships
