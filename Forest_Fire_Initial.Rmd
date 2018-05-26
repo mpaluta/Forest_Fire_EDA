@@ -184,14 +184,27 @@ The distribution seems to spike around zero, which means that there was no rain 
 #FFMD, DMC and day
 
 ```{r}
-plot(forest_fire$fire_size, forest_fire$FFMC^10/factorial(10), xlab= 'Fire Size', ylab = 'Transformed FFMC')
+Med_High_fire <- forest_fire[forest_fire$fire_size != "Low",]
+
+#plot(forest_fire$fire_size, forest_fire$FFMC^10/factorial(10), xlab= 'Fire Size', ylab = 'Transformed FFMC')
+
+ggplot(Med_High_fire, aes(x=log(area), y=FFMC^10/factorial(10)) ) +geom_point()  + labs(x="Log of area", y="FFMC")+geom_smooth(method="lm", se=F)
+
 ```
 FFMC seems to have no bearing on the size of the fire.
 
 ```{r}
 plot(forest_fire$fire_size, forest_fire$DMC, xlab= 'Fire Size', ylab = 'DMC')
 ```
-DMC seems to have no bearing on the size of the fire.
+DMC seems to have no relationship to the size of the fire.
+
+```{r}
+
+#plot(log(Med_High_fire$area), Med_High_fire$DMC, xlab= 'Fire Size', ylab = 'DMC')
+ggplot(Med_High_fire, aes(x=log(area), y=DMC^2) ) +geom_point()  + labs(x="Log of area", y="Square of DMC") + geom_smooth(method='lm', se=F)
+
+```
+Even after scaling the variables, slope is barely perceptible
 
 ```{r}
 #plot(forest_fire$day,forest_fire$fire_size,  ylab= 'Fire Size', xlab = 'Day of the week')
