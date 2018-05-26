@@ -38,8 +38,6 @@ summary(forest_fire)
 
 %% Comment: It might be a good idea to check all columns for na values up here near the top to get it over with %%
 
-The X and Y coordinates have no missing values.
-
 ```{r}
 for (name in names(forest_fire)){
   cat("NAs in " , name , " = " , sum(is.na(forest_fire[,name])),"\n" )
