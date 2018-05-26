@@ -158,7 +158,7 @@ observations stretching further to the right of the bulk of the data. Note from 
 
 ## Relative Humidity
 
-Next we look at a histogram of Relative hUmidity
+Next we look at a histogram of Relative humidity
 
 ```{r}
 summary(forest_fire$RH)
