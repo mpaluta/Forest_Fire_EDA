@@ -181,6 +181,25 @@ The distribution seems to spike around zero, which means that there was no rain 
 #boxplot(rain ~ RH ~ logarea, data = forest_fire)
 ```
 
+#FFMD, DMC and day
+
+```{r}
+plot(forest_fire$fire_size, forest_fire$FFMC^10/factorial(10), xlab= 'Fire Size', ylab = 'Transformed FFMC')
+```
+FFMC seems to have no bearing on the size of the fire.
+
+```{r}
+plot(forest_fire$fire_size, forest_fire$DMC, xlab= 'Fire Size', ylab = 'DMC')
+```
+DMC seems to have no bearing on the size of the fire.
+
+```{r}
+#plot(forest_fire$day,forest_fire$fire_size,  ylab= 'Fire Size', xlab = 'Day of the week')
+forest_fire$sorted_day<-factor(forest_fire$day, levels = c("mon","tue","wed","thu","fri","sat","sun" ))
+ggplot(forest_fire, aes(sorted_day, ..count..))+geom_bar(aes(fill=fire_size), position = "dodge") + labs(x="Day of the week") + labs( y="Count of fires")
+```
+Friday, Saturday and Sunday seem to have seen more fires overall. Saturday and Sunday have seen more large fires
+
 # Analysis of Key Relationships
 
 # Analysis of Secondary Effects
