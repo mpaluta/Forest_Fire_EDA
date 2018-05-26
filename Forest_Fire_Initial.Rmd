@@ -44,23 +44,6 @@ for (name in names(forest_fire)){
   }
 ```
 No NAs in the dataset. Hooray!!
-
-## Transformations
-```{r}
-
-forest_fire$sorted_day<-factor(forest_fire$day, levels = c("mon","tue","wed","thu","fri","sat","sun" ))
-
-forest_fire$fire_size <- cut(forest_fire$area, breaks=c(-Inf,0.01, 12.85, Inf), labels=c('Low','Medium','High'))
-
-forest_fire$dotsize<-NA
-forest_fire[forest_fire$fire_size=="Medium",]$dotsize<-2
-forest_fire[forest_fire$fire_size=="High",]$dotsize<-5
-forest_fire[forest_fire$fire_size=="Low",]$dotsize<-1
-
-Med_High_fire <- forest_fire[forest_fire$fire_size != "Low",]
-
-```
-
 # Univariate Analysis of Key Variables
 
 We have a large number of variables, we begin with a scatterplot matrix. This is helpful for getting
@@ -142,8 +125,8 @@ Plotting the coordinates on a grid, we can see that some areas of the grid are d
 
 ########## replace this filler breakdown with Debalina's high/medium/low breakdown - Done (Vivek) #############3
 
-
-plot(jitter(forest_fire$X, factor=2.5), jitter(forest_fire$Y, factor=2.5), col=forest_fire$fire_size, cex=forest_fire$dotsize)
+forest_fire$fire_size <- cut(forest_fire$area, breaks=c(-0.01,0.01, 12.85, Inf), labels=c('Low','Medium','High'))
+plot(jitter(forest_fire$X, factor=2.5), jitter(forest_fire$Y, factor=2.5), col=forest_fire$fire_size)
 legend(1,9,unique(forest_fire$fire_size),col=1:length(forest_fire$fire_size),pch=1)
 ```
 
@@ -156,6 +139,78 @@ forest_fire$month = factor(forest_fire$month,levels(forest_fire$month)[c(5,4,8,1
 barplot(table(forest_fire$month))
 library(ggplot2)
 ggplot(data = forest_fire, aes(x = month, y = logarea)) + geom_boxplot(aes(fill = logarea), width = 0.8) + theme_bw()
+```
+
+##DC
+
+```{r}
+# Let's take a look at DC index
+summary(ff_level$DC)
+
+# Here is the histogram of DC index
+
+hist(ff_level$DC, main = "Drought Code", 
+     xlab = NULL)
+axis(1, at = 0:9)
+
+# Plot DC and Burned Area
+
+plot(jitter(forest_fire$DC, factor=2),jitter(forest_fire$logarea, factor=2 ),
+     col=factor(forest_fire$fire_size),
+     xlab = "DC", ylab = "area",
+     main = "Relation between DC and area")
+legend=levels(ff_level$fire_size)
+
+#Observation: Could not find very distinctive feature. But for 600 <= Drought Code <=800, fire tendency is high
+```
+
+##ISI
+
+```{r}
+# Now we will check ISI index
+
+summary(forest_fire$ISI)
+
+# Here is the histogram of ISI index
+
+hist(forest_fire$ISI, main = "Initial Spread Index", 
+     xlab = NULL)
+axis(1, at = 0:6)
+
+# Plot ISI and Burned Area
+
+plot(jitter(forest_fire$ISI, factor=2),jitter(forest_fire$logarea, factor=2 ),
+     col=factor(forest_fire$fire_size),
+     xlab = "ISI", ylab = "area",
+     main = "Relation between ISI and area")
+legend=levels(ff_level$fire_size)
+
+#Observation: Fire tendency is highest when ISI is from 5 to 15
+```
+
+##Temperature
+
+```{r}
+#How temperature data looks like. First looking at the summary:
+
+summary(forest_fire$temp)
+
+# Here is the histogram of Temperature in Celcius
+
+hist(forest_fire$temp, main = "Temperature in Celcius", 
+     xlab = NULL)
+axis(1, at = 0:10)
+
+# Let's plot temperature and burned area
+
+plot(jitter(log(forest_fire$temp), factor=2),jitter(forest_fire$logarea, factor=2 ),
+     col=factor(forest_fire$fire_size),
+     xlab = "log(temp)", ylab = "area",
+     main = "Relation between temperature and area")
+legend=levels(forest_fire$fire_size)
+
+#Observation: Maximum fire incident occurs when temperature is in between 15 - 25
+
 ```
 
 ## Wind
@@ -201,36 +256,22 @@ The distribution seems to spike around zero, which means that there was no rain 
 #FFMD, DMC and day
 
 ```{r}
-
-#plot(forest_fire$fire_size, forest_fire$FFMC^10/factorial(10), xlab= 'Fire Size', ylab = 'Transformed FFMC')
-
-ggplot(Med_High_fire, aes(x=log(area), y=FFMC^10/factorial(10)) ) +geom_point()  + labs(x="Log of area", y="FFMC")+geom_smooth(method="lm", se=F)
-
+plot(forest_fire$fire_size, forest_fire$FFMC^10/factorial(10), xlab= 'Fire Size', ylab = 'Transformed FFMC')
 ```
 FFMC seems to have no bearing on the size of the fire.
 
 ```{r}
 plot(forest_fire$fire_size, forest_fire$DMC, xlab= 'Fire Size', ylab = 'DMC')
 ```
-DMC seems to have no relationship to the size of the fire.
+DMC seems to have no bearing on the size of the fire.
 
 ```{r}
-
-#plot(log(Med_High_fire$area), Med_High_fire$DMC, xlab= 'Fire Size', ylab = 'DMC')
-ggplot(Med_High_fire, aes(x=log(area), y=DMC^2) ) +geom_point()  + labs(x="Log of area", y="Square of DMC") + geom_smooth(method='lm', se=F)
-
-```
-Even after scaling the variables, slope is barely perceptible
-
-```{r}
+#plot(forest_fire$day,forest_fire$fire_size,  ylab= 'Fire Size', xlab = 'Day of the week')
+forest_fire$sorted_day<-factor(forest_fire$day, levels = c("mon","tue","wed","thu","fri","sat","sun" ))
 ggplot(forest_fire, aes(sorted_day, ..count..))+geom_bar(aes(fill=fire_size), position = "dodge") + labs(x="Day of the week") + labs( y="Count of fires")
 ```
 Friday, Saturday and Sunday seem to have seen more fires overall. Saturday and Sunday have seen more large fires
 
-```{r}
-ggplot(forest_fire, aes(month, ..count..))+geom_bar(aes(fill=sorted_day)) + facet_grid (fire_size~.) + labs(x="month") + labs( y="Count of fires")
-
-```
 # Analysis of Key Relationships
 
 # Analysis of Secondary Effects
