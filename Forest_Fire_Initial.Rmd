@@ -9,7 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Introduction
+# Introduction
 
 This analysis is motivated by the following research question:
 
@@ -19,38 +19,61 @@ What factors lead to particularly damaging forest fires?
 
 ## Setup
 
-First, we load the car library, which gives us a convenient scatterplotMatrix function.
+First, we load the car library, which gives us a convenient scatterplotMatrix function and the data set.
 
-```{r car}
+```{r car, results='hide'}
 library(car)
-```
-
-```{r, results='hide'}
-# Load the data 
-read.csv("forestfires.csv")
 forest_fire = read.table("forestfires.csv", header=TRUE, sep=",", na.string = "na")
 ```
 
 ## Data Overview
 
+We note that we have 517 observations and 13 variables
 
 ```{r shape}
 nrow(forest_fire)
 str(forest_fire)
-# forest_fire
+summary(forest_fire)
 ```
 
-# Data Arrangement
-===================
-We will try to make different type of data transformations for our analysis
+%% Comment: It might be a good idea to check all columns for na values up here near the top to get it over with %%
 
-#ff_level
-We will add a new column called 'level', to the data frame. And will name this new data frame as ff_level
-This level column will contain the value: high, medium and low
+The X and Y coordinates have no missing values.
+
+```{r}
+sum(is.na(forest_fire$X))
+sum(is.na(forest_fire$Y))
+```
+
+# Univariate Analysis of Key Variables
+
+We have a large number of variables, we begin with a scatterplot matrix. This is helpful for getting
+a high-level overview of the relationships between our variables and can draw our attention to important
+features we want to investigate further.
+
+```{r}
+#scatterplotMatrix(~ RH + wind + rain + logarea, data=forest_fire, smooth = TRUE, main = "Scatterplot Matrix for Relative Humidity, Wind and Rain")
+```
+
+## Area
+
+%% Comment: need to address log(0) values being dropped %%
+
+Area seems to be right skewed. To normalize the data, we could take the log of area.
+
+```{r}
+forest_fire$logarea = log(forest_fire$area)
+hist(forest_fire$area)
+hist(forest_fire$logarea)
+```
+
+However, as a signficant portion of our area data is zero and has an undefined logarithm, we also look at an approach of transforming area into a factor of low, medium, or high fire level.
+
+Note: the mean fire area is 12.85.
+
 For the rows with area = 0, we will populate the level value as 'low'
 For the rows with 0 < area < 12.85, we will populate the level value as 'medium'
 For the rows with area >= 12.85, we will populate the level value as 'high'
-#--
 
 ```{r}
 
@@ -93,37 +116,22 @@ str(ff_level)
 <!-- legend=levels(ff_level$level) -->
 <!-- ``` -->
 
-# Area
+## Spatial coordinates (X & Y)
 
-Area appears to be right-skewed. A log transformation helps normalize the data.
-
-```{r}
-forest_fire$logArea = log(forest_fire$area)
-hist(forest_fire$area)
-hist(forest_fire$logArea)
-```
-
-# Spatial coordinates
-
-The X and Y coordinates have no missing values.
-
-```{r}
-sum(is.na(forest_fire$X))
-sum(is.na(forest_fire$Y))
-```
-
-# test
+%% This might below in next section: Analysis of Key Relationships %%
 
 Plotting the coordinates on a grid, we can see that some areas of the grid are densely populated with data and other areas are sparse. The colors represent size of the fire.
 
 ```{r}
-# filler - define a factor for category of fire
+
+########## replace this filler breakdown with Debalina's high/medium/low breakdown #############3
+
 forest_fire$fire_size <- cut(forest_fire$area, breaks=3, labels=c('Low','Medium','High'))
 plot(jitter(forest_fire$X), jitter(forest_fire$Y), col=forest_fire$fire_size)
 legend(1,9,unique(forest_fire$fire_size),col=1:length(forest_fire$fire_size),pch=1)
 ```
 
-# Month
+## Month
 
 A histogram shows that most of the data comes from spring and summer months. We can use box plots of month and log of area to see the distributions of burned area by month.
 
@@ -131,94 +139,53 @@ A histogram shows that most of the data comes from spring and summer months. We 
 forest_fire$month = factor(forest_fire$month,levels(forest_fire$month)[c(5,4,8,1,9,7,6,2,12,11,10,3)])
 barplot(table(forest_fire$month))
 library(ggplot2)
-ggplot(data = forest_fire, aes(x = month, y = logArea)) + geom_boxplot(aes(fill = logArea), width = 0.8) + theme_bw()
+ggplot(data = forest_fire, aes(x = month, y = logarea)) + geom_boxplot(aes(fill = logarea), width = 0.8) + theme_bw()
 ```
 
+## Wind
 
-## Introduction
-
-In some areas, forest fires are a major environmental concern, endangering human lives and causing substantial
-economic damage. This analysis is motivated by the following research question:What factors lead to particularly damaging forest fires? 
-
-## Setup
-First we load the car library which gives us a convenient scatterplotMatrix function.
-```{r car}
-library(car)
-```
-
-#Data Selection
+Below is a histogram of wind.
 
 ```{r}
-#We note that we have 517 observations and 13 variables
-nrow(forestfires)
+summary(forest_fire$wind)
 
-```
-```{r}
-str(forestfires)
+hist(forest_fire$wind,breaks=seq(0.4,9.4,0.5),main = "Wind Speed",xlab= NULL)
 ```
 
-Looking at the rain and area variable, we notice that there are mostly 0's.
-
-# Look at the summary of statistics for the forestfires
-```{r}
-summary(forestfires)
-```
-#Lets look at the summary of area 
-```{r}
-summary(forestfires$area)
-```
-
-Area seems to be right skewed. So to normalize the data, we are taking log of area
-
-```{r}
-forestfires$logarea = log(forestfires$area)
-hist(forestfires$area)
-hist(forestfires$logarea)
-```
-
-#Exploratory Analaysis
-
-We have a large number of variables, we begin with a scatterplot matrix. This is helpful for getting
-a high-level overview of the relationships between our variables and can draw our attention to important
-features we want to investigate further.
-
-```{r}
-#scatterplotMatrix(~ RH + wind + rain + logarea, data=forestfires, smooth = TRUE, main = "Scatterplot Matrix for Relative Humidity, Wind and Rain")
-```
-
-
-#create histogram of wind
-```{r}
-summary(forestfires$wind)
-
-hist(forestfires$wind,breaks=seq(0.4,9.4,0.5),main = "Wind Speed",xlab= NULL)
-```
 Visually, the histogram seems to have a positive skew (right skew). This means that there are
-observations stretching further to the right of the bulk of the data. Note from summary that the mean is greater
-than the median, which is typically what we see for positively skewed variables.
+observations stretching further to the right of the bulk of the data. Note from summary that the mean is greater than the median, which is typically what we see for positively skewed variables.
 
-#create histogram of Relative hUmidity
+## Relative Humidity
+
+Next we look at a histogram of Relative hUmidity
+
 ```{r}
-summary(forestfires$RH)
-hist(forestfires$RH,breaks=seq(15,100,5),main = "Percentage of Relative Humidity",xlab= "RH in %")
-```
-Visually, the histogram seems to have a positive skew (right skew) again. This means that there are
-observations stretching further to the right of the bulk of the data. Note from summary that the mean is greater
-than the median, which is typically what we see for positively skewed variables.
-
-We next examine our Rain variable
-
-#create histogram of Rain 
-```{r}
-summary(forestfires$rain)
-hist(forestfires$rain, breaks=seq(0.0,6.4,0.2), main = "Outside rain in mm/m2", xlab = "Rain in mm/m2" )
+summary(forest_fire$RH)
+hist(forest_fire$RH,breaks=seq(15,100,5),main = "Percentage of Relative Humidity",xlab= "RH in %")
 ```
 
+Again, we see the same evidence of right skew as in wind speed.
 
+## Rain
 
-It almost seems like that distribution is spiked at around zero, which means that there was no rain at all.
+We next examine our Rain variable. We notice that it is mostly 0's.
+
+```{r}
+summary(forest_fire$rain)
+hist(forest_fire$rain, breaks=seq(0.0,6.4,0.2), main = "Outside rain in mm/m2", xlab = "Rain in mm/m2" )
+```
+
+The distribution seems to spike around zero, which means that there was no rain at all.
 
 #boxplot
 ```{r}
-#boxplot(rain ~ RH ~ logarea, data = forestfires)
+#boxplot(rain ~ RH ~ logarea, data = forest_fire)
 ```
+
+# Analysis of Key Relationships
+
+# Analysis of Secondary Effects
+
+# Conclusion
+
+
