@@ -41,10 +41,13 @@ summary(forest_fire)
 The X and Y coordinates have no missing values.
 
 ```{r}
-sum(is.na(forest_fire$X))
-sum(is.na(forest_fire$Y))
-```
 
+for (name in names(forest_fire)){
+  cat("NAs in " , name , " = " , sum(is.na(forest_fire[,name])),"\n" )
+  }
+
+```
+No NAs in the dataset. Hooray!!
 # Univariate Analysis of Key Variables
 
 We have a large number of variables, we begin with a scatterplot matrix. This is helpful for getting
