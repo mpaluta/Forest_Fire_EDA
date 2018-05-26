@@ -44,6 +44,25 @@ for (name in names(forest_fire)){
   }
 ```
 No NAs in the dataset. Hooray!!
+
+
+## Transformations
+```{r}
+
+forest_fire$sorted_day<-factor(forest_fire$day, levels = c("mon","tue","wed","thu","fri","sat","sun" ))
+
+forest_fire$fire_size <- cut(forest_fire$area, breaks=c(-Inf,0.01, 25, Inf), labels=c('Low','Medium','High'))
+
+forest_fire$dotsize<-NA
+forest_fire[forest_fire$fire_size=="Medium",]$dotsize<-2
+forest_fire[forest_fire$fire_size=="High",]$dotsize<-5
+forest_fire[forest_fire$fire_size=="Low",]$dotsize<-1
+
+Med_High_fire <- forest_fire[forest_fire$fire_size != "Low",]
+
+forest_fire$month = factor(forest_fire$month,levels(forest_fire$month)[c(5,4,8,1,9,7,6,2,12,11,10,3)])
+```
+
 # Univariate Analysis of Key Variables
 
 We have a large number of variables, we begin with a scatterplot matrix. This is helpful for getting
@@ -125,8 +144,17 @@ Plotting the coordinates on a grid, we can see that some areas of the grid are d
 
 ########## replace this filler breakdown with Debalina's high/medium/low breakdown - Done (Vivek) #############3
 
-forest_fire$fire_size <- cut(forest_fire$area, breaks=c(-0.01,0.01, 12.85, Inf), labels=c('Low','Medium','High'))
+forest_fire$fire_size <- cut(forest_fire$area, breaks=c(-0.01,0.01, 25, Inf), labels=c('Low','Medium','High'))
 plot(jitter(forest_fire$X, factor=2.5), jitter(forest_fire$Y, factor=2.5), col=forest_fire$fire_size)
+legend(1,9,unique(forest_fire$fire_size),col=1:length(forest_fire$fire_size),pch=1)
+```
+
+```{r}
+
+########## replace this filler breakdown with Debalina's high/medium/low breakdown - Done (Vivek) #############3
+
+
+plot(jitter(forest_fire$X, factor=2.5), jitter(forest_fire$Y, factor=2.5), col=forest_fire$fire_size, cex=forest_fire$dotsize)
 legend(1,9,unique(forest_fire$fire_size),col=1:length(forest_fire$fire_size),pch=1)
 ```
 
@@ -135,7 +163,7 @@ legend(1,9,unique(forest_fire$fire_size),col=1:length(forest_fire$fire_size),pch
 A histogram shows that most of the data comes from spring and summer months. We can use box plots of month and log of area to see the distributions of burned area by month.
 
 ```{r}
-forest_fire$month = factor(forest_fire$month,levels(forest_fire$month)[c(5,4,8,1,9,7,6,2,12,11,10,3)])
+
 barplot(table(forest_fire$month))
 library(ggplot2)
 ggplot(data = forest_fire, aes(x = month, y = logarea)) + geom_boxplot(aes(fill = logarea), width = 0.8) + theme_bw()
@@ -256,22 +284,44 @@ The distribution seems to spike around zero, which means that there was no rain 
 #FFMD, DMC and day
 
 ```{r}
-plot(forest_fire$fire_size, forest_fire$FFMC^10/factorial(10), xlab= 'Fire Size', ylab = 'Transformed FFMC')
+
+#plot(forest_fire$fire_size, forest_fire$FFMC^10/factorial(10), xlab= 'Fire Size', ylab = 'Transformed FFMC')
+
+ggplot(Med_High_fire, aes(x=log(area), y=FFMC^10/factorial(10)) ) +geom_point()  + labs(x="Log of area", y="FFMC")+geom_smooth(method="lm", se=F)
+
 ```
 FFMC seems to have no bearing on the size of the fire.
 
 ```{r}
 plot(forest_fire$fire_size, forest_fire$DMC, xlab= 'Fire Size', ylab = 'DMC')
 ```
-DMC seems to have no bearing on the size of the fire.
+DMC seems to have no relationship to the size of the fire.
 
 ```{r}
-#plot(forest_fire$day,forest_fire$fire_size,  ylab= 'Fire Size', xlab = 'Day of the week')
-forest_fire$sorted_day<-factor(forest_fire$day, levels = c("mon","tue","wed","thu","fri","sat","sun" ))
+
+#plot(log(Med_High_fire$area), Med_High_fire$DMC, xlab= 'Fire Size', ylab = 'DMC')
+ggplot(Med_High_fire, aes(x=log(area), y=DMC^2) ) +geom_point()  + labs(x="Log of area", y="Square of DMC") + geom_smooth(method='lm', se=F)
+
+```
+Even after scaling the variables, slope is barely perceptible
+
+```{r}
 ggplot(forest_fire, aes(sorted_day, ..count..))+geom_bar(aes(fill=fire_size), position = "dodge") + labs(x="Day of the week") + labs( y="Count of fires")
 ```
 Friday, Saturday and Sunday seem to have seen more fires overall. Saturday and Sunday have seen more large fires
 
+```{r}
+ggplot(forest_fire, aes(month, ..count..))+geom_bar(aes(fill=sorted_day)) + labs(x="month") + labs( y="Count of fires")
+
+# + facet_grid (fire_size~.)
+
+```
+
+```{r}
+
+scatterplotMatrix(~RH+FFMC+DMC+ISI+DC+month, data=forest_fire)
+
+```
 # Analysis of Key Relationships
 
 # Analysis of Secondary Effects
