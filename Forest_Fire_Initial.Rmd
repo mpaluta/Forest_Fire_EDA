@@ -41,10 +41,11 @@ summary(forest_fire)
 The X and Y coordinates have no missing values.
 
 ```{r}
-sum(is.na(forest_fire$X))
-sum(is.na(forest_fire$Y))
+for (name in names(forest_fire)){
+  cat("NAs in " , name , " = " , sum(is.na(forest_fire[,name])),"\n" )
+  }
 ```
-
+No NAs in the dataset. Hooray!!
 # Univariate Analysis of Key Variables
 
 We have a large number of variables, we begin with a scatterplot matrix. This is helpful for getting
@@ -103,10 +104,10 @@ nrow(case_low)##low count = 247
 ff_level = merge(case_high, case_medium, all = TRUE)
 ff_level = merge(case_low, ff_level, all = TRUE)
 
-####Logerithm - looking at the data against area we see that there are huge number of data with value zero. So will replace area value with log(area) value
+####Logarithm - looking at the data against area we see that there are huge number of data with value zero. So will replace area value with log(area) value
 #
-ff_level$area = log(ff_level$area)
-str(ff_level)
+#ff_level$area = log(ff_level$area) - Vivek - suggest we don't overwrite an existing variable. We already have larea to store log of area.
+#str(ff_level)
 ```
 
 <!-- #Plot X, Y  -->
@@ -124,10 +125,10 @@ Plotting the coordinates on a grid, we can see that some areas of the grid are d
 
 ```{r}
 
-########## replace this filler breakdown with Debalina's high/medium/low breakdown #############3
+########## replace this filler breakdown with Debalina's high/medium/low breakdown - Done (Vivek) #############3
 
-forest_fire$fire_size <- cut(forest_fire$area, breaks=3, labels=c('Low','Medium','High'))
-plot(jitter(forest_fire$X), jitter(forest_fire$Y), col=forest_fire$fire_size)
+forest_fire$fire_size <- cut(forest_fire$area, breaks=c(-0.01,0.01, 12.85, Inf), labels=c('Low','Medium','High'))
+plot(jitter(forest_fire$X, factor=2.5), jitter(forest_fire$Y, factor=2.5), col=forest_fire$fire_size)
 legend(1,9,unique(forest_fire$fire_size),col=1:length(forest_fire$fire_size),pch=1)
 ```
 
