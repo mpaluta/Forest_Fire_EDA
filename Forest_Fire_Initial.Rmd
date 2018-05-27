@@ -360,16 +360,6 @@ ggplot(pdfire, aes(x=DMC, y=RH)) + geom_point() + geom_smooth(method = 'lm', se 
 ggplot(pdfire, aes(x=DC, y=RH)) + geom_point() + geom_smooth(method = 'lm', se = F)
 ```
 
-```{r}
-plot(pdfire$month, pdfire$DC)
-
-# + facet_grid (fire_size~.)
-
-plot(pdfire$month, pdfire$DMC)
-
-plot(pdfire$month, pdfire$RH)
-```
-
 # Conclusion
 
 
