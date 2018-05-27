@@ -328,7 +328,11 @@ plot(forest_fire$month, forest_fire$temp)
 
 ```{r}
 
+<<<<<<< HEAD
 scatterplotMatrix(~RH+FFMC+DMC+ISI+DC+month+logarea, data=pdfire)  
+=======
+scatterplotMatrix(~RH+FFMC+DMC+ISI+DC+month, data=forest_fire)  
+>>>>>>> 5ef5529af364e66b7e57e0446d40b2ab91099e58
 
 ```
 # Analysis of Key Relationships
@@ -343,7 +347,7 @@ ggplot(pdfire, aes(x=DMC, y=logarea)) + geom_point() + geom_smooth(method = 'lm'
 ```
 
 ```{r}
-ggplot(pdfire, aes(x=RH, y=logarea)) + geom_point() + geom_smooth(method = 'lm', se = F)
+ggplot(pdfire, aes(x=RH, y=logarea)) + geom_point() + geom_smooth(method = 'lm', se = F) 
 ```
 
 
@@ -357,7 +361,7 @@ ggplot(pdfire, aes(x=DMC, y=RH)) + geom_point() + geom_smooth(method = 'lm', se 
 ```
 
 ```{r}
-ggplot(pdfire, aes(x=DC, y=RH)) + geom_point() + geom_smooth(method = 'lm', se = F)
+ggplot(pdfire, aes(x=DC, y=RH)) + geom_point() + geom_smooth(method = 'lm', se = F) 
 ```
 
 # Conclusion
