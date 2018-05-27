@@ -61,6 +61,7 @@ forest_fire[forest_fire$fire_size=="Low",]$dotsize<-1
 Med_High_fire <- forest_fire[forest_fire$fire_size != "Low",]
 
 forest_fire$month = factor(forest_fire$month,levels(forest_fire$month)[c(5,4,8,1,9,7,6,2,12,11,10,3)])
+pdfire<-forest_fire[forest_fire$fire_size=="High",] #particularly damaging fire
 ```
 
 # Univariate Analysis of Key Variables
@@ -327,22 +328,46 @@ plot(forest_fire$month, forest_fire$temp)
 
 ```{r}
 
-scatterplotMatrix(~RH+FFMC+DMC+ISI+DC+month, data=forest_fire)  
+scatterplotMatrix(~RH+FFMC+DMC+ISI+DC+month+logarea, data=pdfire)  
 
 ```
 # Analysis of Key Relationships
+```{r}
 
-# Analysis of Secondary Effects
+ggplot(pdfire, aes(x=DC, y=logarea)) + geom_point() + geom_smooth(method = 'lm', se = F)
 
+```
 
 ```{r}
-plot(forest_fire$month, forest_fire$DC)
+ggplot(pdfire, aes(x=DMC, y=logarea)) + geom_point() + geom_smooth(method = 'lm', se = F)
+```
+
+```{r}
+ggplot(pdfire, aes(x=RH, y=logarea)) + geom_point() + geom_smooth(method = 'lm', se = F)
+```
+
+
+# Analysis of Secondary Effects
+```{r}
+ggplot(pdfire, aes(x=DC, y=DMC)) + geom_point() + geom_smooth(method = 'lm', se = F)
+```
+
+```{r}
+ggplot(pdfire, aes(x=DMC, y=RH)) + geom_point() + geom_smooth(method = 'lm', se = F)
+```
+
+```{r}
+ggplot(pdfire, aes(x=DC, y=RH)) + geom_point() + geom_smooth(method = 'lm', se = F)
+```
+
+```{r}
+plot(pdfire$month, pdfire$DC)
 
 # + facet_grid (fire_size~.)
 
-plot(forest_fire$month, forest_fire$DMC)
+plot(pdfire$month, pdfire$DMC)
 
-plot(forest_fire$month, forest_fire$RH)
+plot(pdfire$month, pdfire$RH)
 ```
 
 # Conclusion
