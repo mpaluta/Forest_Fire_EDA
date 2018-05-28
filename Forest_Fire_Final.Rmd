@@ -563,6 +563,34 @@ ggplot(pdfire, aes(x=DC, y=RH)) + geom_point() + geom_smooth(method = 'lm', se =
 ```
 ==========End of Secondary Effects Analysis by Vivek=============
 
+==========Starting Conclusion by Tina=============
 # Conclusion
+
+An analysis of the provided data points does not yield a strong evidence of any pattern of the relationship for the entire year. From the analysis above, we see that the fire season runs during August and September months with peak of activity on weekends (Friday, Saturday, Sunday). Though there seems to be a trend that shows maximum burned area during those months, we don't see a strong relationship between the key variables of interest.
+Key relationship analysis for the months of August and September suggests that:
+1. Fine Fuel Moisture Code (FFMC) value is greater than 80 during this time
+2. Duff Moisture Code (DMC), Drought Code (DC) and high burned area is also positively correlated during the same time
+3. Initial Spread Index (ISI) belongs to 5-15 range during this time, which can be another cause of forest fire.
+5. On plotting high burned area versus temperature we see maximum burned area between temperature range of 15 to 25. This pattern is more evident when plotting against logarithmic scale of temperature
+6. Relative humidity stays in the range of 40-50 during the time of high burned area 
+7. Wind Speed variable stays between 3-5 km/hr that familiar cause of forest fire
+
+Secondary effects also show that that the top layer is dry for most months when substantial data is available. Summer months July, August and September are definitely dry. 
+There is not enough data for winter months to see a definite pattern. Data shows value of DC rising as summer approaches and peaks in the month of Aug and September. Flammability of deep organic layer is considered a reason for sustained forest fires.
+
+
+```{r}
+scatterplotMatrix(~FFMC+DMC+ISI+DC+temp+RH+month+wind, data=forest_fire)  
+
+```
+
+
+The provided sample size is not strong enough to generalize the relationship for a larger burned area as well. There could be other factors that can also cause forest fires and can influence the analysis provided they are available. An example are factors such as lightning, human factors like igniting of vegetation. 
+
+
+==========Ending Conclusion by Tina=============
+
+
+
 
 
