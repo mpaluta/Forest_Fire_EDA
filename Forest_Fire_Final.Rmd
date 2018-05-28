@@ -533,9 +533,22 @@ And the plot shows that wind speed is in the range of 3 - 5 km/hr during this ti
 
 # Analysis of Secondary Effects
 ==========Vivek=============
+
 ```{r}
-ggplot(pdfire, aes(x=DC, y=DMC)) + geom_point() + geom_smooth(method = 'lm', se = F)
+ggplot(forest_fire, aes(x=month, y=FFMC^8/factorial(8)))  + geom_point(size=5, color = "red", alpha=0.1) + labs(x="Month",  y="Transformed FFMC", title = "Dryness of top organic layer by month")
 ```
+Top layer is dry for most months where substantial data is available. Summer months July, Aug and Sep are definitely dry. Not enough data in winter months to make a determination.
+
+```{r}
+ggplot(forest_fire, aes(x=month, y=DMC))  + geom_point(size=2, aes(color = fire_size), alpha=0.5) + labs(x="Month",  y="DC", title = "Dryness of organic layer at moderate depth by month")
+```
+
+
+```{r}
+ggplot(forest_fire, aes(x=month, y=DC))  + geom_point(size=5, color = "blue", alpha=0.1) + labs(x="Month",  y="DC", title = "Dryness of Deep organic layer by month")
+```
+
+Data shows value of DC rising as summer approaches and peaks in the month of Aug and September. Flammability of deep organic layer is considered a reason for sustained forest fires.
 
 ```{r}
 ggplot(pdfire, aes(x=DMC, y=RH)) + geom_point() + geom_smooth(method = 'lm', se = F)
