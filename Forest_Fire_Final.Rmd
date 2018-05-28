@@ -532,6 +532,7 @@ And the plot shows that wind speed is in the range of 3 - 5 km/hr during this ti
 
 
 # Analysis of Secondary Effects
+==========Vivek=============
 ```{r}
 ggplot(pdfire, aes(x=DC, y=DMC)) + geom_point() + geom_smooth(method = 'lm', se = F)
 ```
@@ -543,6 +544,7 @@ ggplot(pdfire, aes(x=DMC, y=RH)) + geom_point() + geom_smooth(method = 'lm', se 
 ```{r}
 ggplot(pdfire, aes(x=DC, y=RH)) + geom_point() + geom_smooth(method = 'lm', se = F) 
 ```
+==========End of Secondary Effects Analysis by Vivek=============
 
 # Conclusion
 
