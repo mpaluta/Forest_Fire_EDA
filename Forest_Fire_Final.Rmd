@@ -1,5 +1,5 @@
 ---
-title: "Forest_Fire_Initial"
+title: "Forest_Fire_EDA"
 author: "Debalina Maiti, Mark Paluta, Tina Agarwal, Vivek Agarwal"
 date: "5/24/2018"
 output: pdf_document
@@ -11,7 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-This analysis is motivated by the following research question:
+In some areas, forest fires are a major environmental concern, endangering human lives and causing substantial
+economic damage.This analysis is motivated by the following research question:
 
 \begin{center}
 What factors lead to particularly damaging forest fires?
@@ -45,11 +46,12 @@ We required several transformations to our data before we could properly explore
 Note: the mean fire area is 12.85. We categorize fires of size 0 as low, 0 to 12.85 as medium, and 
 above 12.85 as high.
 
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=80)}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=75)}
 
 forest_fire$sorted_day<-factor(forest_fire$day, levels = c("mon","tue","wed","thu","fri","sat","sun" ))
 
-forest_fire$fire_size <- cut(forest_fire$area, breaks=c(-Inf,0.01, 25, Inf), labels=c('Low','Medium','High'))
+forest_fire$fire_size <- cut(forest_fire$area, breaks=c(-Inf,0.01, 25, Inf), 
+                             labels=c('Low','Medium','High'))
 
 forest_fire$dotsize<-NA
 forest_fire[forest_fire$fire_size=="Medium",]$dotsize<-2
@@ -69,8 +71,9 @@ pdfire<-forest_fire[forest_fire$fire_size=="High",] #particularly damaging fire
 
 With transformations complete, we begin with a scatterplot matrix. This is helpful for getting a high-level overview of the relationships between our variables and can draw our attention to important features we want to investigate further. Note that to plot all the 13 variables in one matrix reduces legibility, so we will just visualize a subset of the variables here to illustrate the concept.
 
-```{r message=FALSE, warning=FALSE}
-scatterplotMatrix(~ RH + wind + rain + logarea, data=forest_fire, smooth = TRUE, main = "Scatterplot Matrix for Relative Humidity, Wind, Rain, & log of Area")
+```{r message=FALSE, warning=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=75)}
+scatterplotMatrix(~ RH + wind + rain + logarea, data=forest_fire, smooth = TRUE, 
+                  main = "Scatterplot Matrix for Relative Humidity, Wind, Rain, & log of Area")
 ```
 
 ## Area
@@ -89,8 +92,9 @@ barplot(table(forest_fire$fire_size))
 
 Plotting the coordinates on a grid, we can see that some areas of the grid are densely populated with data and other areas are sparse. The colors represent size of the fire. We also exaggerate the size of the circles so that it is easier to notice the difference. Fires appear to be contained in a strip ranging from lower left corner to the upper right corner, so we suspect this represents the footprint of the park. Also note that the upper left corner is especially bare of fires, so it may not be within the park or may not have many trees. Beyond that, we don't see a trend of fire size with respect to geography within the affected areas.
 
-```{r fig.height=4, fig.width=6}
-plot(jitter(forest_fire$X, factor=2.5), jitter(forest_fire$Y, factor=2.5), col=forest_fire$fire_size, cex=forest_fire$dotsize)
+```{r fig.height=4, fig.width=6, tidy=TRUE, tidy.opts=list(width.cutoff=75)}
+plot(jitter(forest_fire$X, factor=2.5), jitter(forest_fire$Y, factor=2.5), 
+     col=forest_fire$fire_size, cex=forest_fire$dotsize)
 legend(1,9,unique(forest_fire$fire_size),col=1:length(forest_fire$fire_size),pch=1)
 ```
 
@@ -154,8 +158,9 @@ hist(forest_fire$RH,breaks=seq(15,100,5),main = "Percentage of Relative Humidity
 
 We next examine our Rain variable. We notice that it is mostly zeroes, meaning no rain or no measureable rain. This variable will likely not be very effective in predicting fire size as it has such little variation overall. We could convert this variable to "rain" versus "no rain", but with almost no non-zero data, it would be difficult to capture any significant relationship to area.
 
-```{r fig.height=3, fig.width=4}
-hist(forest_fire$rain, breaks=seq(0.0,6.4,0.2), main = "Outside rain in mm/m2", xlab = "Rain in mm/m2" )
+```{r fig.height=3, fig.width=4, tidy=TRUE, tidy.opts=list(width.cutoff=75)}
+hist(forest_fire$rain, breaks=seq(0.0,6.4,0.2), main = "Outside rain in mm/m2", 
+     xlab = "Rain in mm/m2" )
 ```
 
 From the above Univariate Analysis of Key Variables the major observations are as follows. Note that these observations are thus far only related to quantity of fires, and we will look into fire size and particularly damaging fires in the next section.
@@ -172,8 +177,10 @@ From the above Univariate Analysis of Key Variables the major observations are a
 
 #Bivariate Relationship between Month, Day of the Week and Count of Fire
 
-```{r fig.height=4, fig.width=6}
-ggplot(forest_fire, aes(month, ..count..))+geom_bar(aes(fill=sorted_day)) + labs(x="month") + labs( y="Count of fires")
+```{r fig.height=4, fig.width=6, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+ggplot(forest_fire, 
+       aes(month, ..count..))+geom_bar(aes(fill=sorted_day))+ labs(x="month")+ labs( y="Count of fires")
+
 ```
 
 Observation: From the above plot we clearly see that fire tendency is much more higher during the weekend-s (Fri, Sat, Sun) of August and September than the other time of the year.
@@ -183,9 +190,13 @@ So while we will be analyzing other key relationships, we will check the conditi
 ##Bivariate Relationship between FFMC and Fire
 
 Let's first plot FFMC against fire size:
-```{r fig.height=3, fig.width=4}
-ggplot(Med_High_fire, aes(x=log(area), y=FFMC^10/factorial(10)) ) +geom_point()  + labs(x="Log of area", y="FFMC")+geom_smooth(method="lm", se=F)
+```{r fig.height=3, fig.width=4, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+ggplot(Med_High_fire, aes(x=log(area), 
+        y=FFMC^10/factorial(10)) ) +geom_point()+ labs(x="Log of area", 
+        y="FFMC")+geom_smooth(method="lm", se=F)
+
 ```
+
 FFMC seems to have no bearing on the size of the fire.
 
 ```{r fig.height=3, fig.width=4}
@@ -208,21 +219,23 @@ Let's first plot DMC against fire size:
 ```{r fig.height=3, fig.width=4}
 plot(forest_fire$fire_size, forest_fire$DMC, xlab= 'Fire Size', ylab = 'DMC')
 ```
-DMC seems to have no relationship to the size of the fire.
 
-Let's scale the data little bit and try to analyse relationship
+DMC seems to have no relationship to the size of the fire.Let's scale the data little bit and try to analyse relationship
 
-```{r fig.height=3, fig.width=4}
-ggplot(Med_High_fire, aes(x=log(area), y=DMC^2) ) +geom_point()  + labs(x="Log of area", y="Square of DMC") + geom_smooth(method='lm', se=F)
+```{r fig.height=3, fig.width=4,tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+ggplot(Med_High_fire, 
+       aes(x=log(area), y=DMC^2) ) +geom_point()+ labs(x="Log of area", y="Square of DMC")+ geom_smooth(method='lm', se=F)
 
 ```
+
 Even after scaling the variables, slope is barely perceptible
 
 Observation: We don't see a very impressive relationship here between DMC and forest fire.
 
 ```{r fig.height=3, fig.width=4}
 ggplot(pdfire, aes(x=DMC, y=area)) + geom_point() + geom_smooth(method = 'lm', se = F)
-cor(pdfire$DMC, pdfire$area)
+
+cor(pdfire$DMC, pdfire$area,use = "complete.obs")
 ```
 From the above plot and correlation it looks like DMC and higher burned area positively corelated.
 
@@ -328,61 +341,78 @@ plot(forest_fire$month, forest_fire$wind)
 And the plot shows that wind speed is in the range of 3 - 5 km/hr during this time, which is also a familiar condition of forest fire.
 
 # Analysis of Secondary Effects
-```{r fig.height=4, fig.width=7}
+```{r fig.height=4, fig.width=7,tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #ggplot(forest_fire, aes(x=month, y=FFMC^8/factorial(8)))  + geom_point(size=5, color = "red", alpha=0.1) + labs(x="Month",  y="Transformed FFMC", title = "Dryness of top organic layer by month")
 
-ggplot(forest_fire, aes(x=month, y=FFMC^8/factorial(8)))  + geom_point(size=3, aes(color = fire_size), alpha=0.3) + facet_grid (fire_size~.) + labs(x="Month",  y="Transformed FFMC", title = "Dryness of top organic layer by month")
+ggplot(forest_fire, 
+       aes(x=month, y=FFMC^8/factorial(8))) + geom_point(size=3, 
+       aes(color = fire_size), alpha=0.3) + facet_grid (fire_size~.) + labs(x="Month",  
+       y="Transformed FFMC", 
+       title = "Dryness of top organic layer by month")
 ```
 Top layer is dry for most months where substantial data is available. Summer months July, Aug and Sep are definitely dry. Not enough data in winter months to make a determination.
 
-```{r fig.height=4, fig.width=7}
-ggplot(forest_fire, aes(x=month, y=DMC))  + geom_point(size=3, aes(color = fire_size), alpha=0.3) + facet_grid (fire_size~.) + labs(x="Month",  y="DMC", title = "Dryness of organic layer at moderate depth by month")
+```{r fig.height=4, fig.width=7,tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+ggplot(forest_fire, 
+       aes(x=month, y=DMC))  + geom_point(size=3, 
+       aes(color = fire_size), alpha=0.3) + facet_grid (fire_size~.)+labs(x="Month",  
+       y="DMC", title = "Dryness of organic layer at moderate depth by month")
 ```
 
 
-```{r fig.height=4, fig.width=7}
-ggplot(forest_fire, aes(x=month, y=DC))  + geom_point(size=3, aes(color = fire_size), alpha=0.3) + facet_grid (fire_size~.) + labs(x="Month",  y="DC", title = "Dryness of Deep organic layer by month")
+```{r fig.height=4, fig.width=7,tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+ggplot(forest_fire, 
+       aes(x=month, y=DC))  + geom_point(size=3, 
+       aes(color = fire_size), alpha=0.3) + facet_grid (fire_size~.) + labs(x="Month",  
+       y="DC", title = "Dryness of Deep organic layer by month")
 
 #ggplot(forest_fire, aes(x=month, y=DC))  + geom_point(size=5, color = "blue", alpha=0.1) + labs(x="Month",  y="DC", title = "Dryness of Deep organic layer by month")
 ```
 
 Data shows value of DC rising as summer approaches and peaks in the month of Aug and September. Flammability of deep organic layer is considered a reason for sustained forest fires.
 
-```{r fig.height=4, fig.width=7}
+```{r fig.height=4, fig.width=7,tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 
-ggplot(forest_fire, aes(x=month, y=temp))  + geom_boxplot() + labs(x="Month",  y="Temperature", title = "Temperature by month")
+ggplot(forest_fire, 
+       aes(x=month, y=temp))  + geom_boxplot() + labs(x="Month",  
+       y="Temperature", title = "Temperature by month")
 
 ```
 
 
-```{r fig.height=4, fig.width=7}
-ggplot(forest_fire, aes(x=jitter(X, factor = 2), y=jitter(Y, factor = 2))) + geom_point(aes(color=month ), size = 4, alpha = 0.5) + labs(x="X",  y="Y", title = "Location of fire by month")
+```{r fig.height=4, fig.width=7,tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+ggplot(forest_fire, aes(x=jitter(X, factor = 2), 
+       y=jitter(Y, factor = 2))) + geom_point(aes(color=month ), 
+       size = 4, alpha = 0.5) + labs(x="X",  y="Y", title = "Location of fire by month")
 ```
 No fires seen in top left and bottom right of the park. Suspect this has to do with the shape of the park itself. Plot is predominantly (greenish) blue indicating most fires observed in summer months of Jul, Aug and September.
 
-```{r fig.height=4, fig.width=7}
+```{r fig.height=4, fig.width=7,tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 
 areadm = aggregate(forest_fire$area, by=list(forest_fire$sorted_day, forest_fire$month), FUN=sum)
 areadm$x=-log(areadm$x)
 
-ggplot(areadm, aes(Group.2, Group.1)) + geom_tile(aes(fill = x)) + scale_colour_gradient2()+labs(x="month",  y="day", title = "Heat map by month and day")
+ggplot(areadm, 
+       aes(Group.2, Group.1)) + geom_tile(aes(fill = x)) + scale_colour_gradient2()+labs(x="month",  
+       y="day", title = "Heat map by month and day")
 
 ```
 
 # Conclusion
 
-An analysis of the provided data points does not yield a strong evidence of any pattern of the relationship for the entire year. From the analysis above, we see that the fire season runs during August and September months with peak of activity on weekends (Friday, Saturday, Sunday). Though there seems to be a trend that shows maximum burned area during those months, we don't see a strong relationship between the key variables of interest.
-Key relationship analysis for the months of August and September suggests that:
-1. Fine Fuel Moisture Code (FFMC) value is greater than 80 during this time
-2. Duff Moisture Code (DMC), Drought Code (DC) and high burned area is also positively correlated during the same time
-3. Initial Spread Index (ISI) belongs to 5-15 range during this time, which can be another cause of forest fire.
-5. On plotting high burned area versus temperature we see maximum burned area between temperature range of 15 to 25. This pattern is more evident when plotting against logarithmic scale of temperature
-6. Relative humidity stays in the range of 40-50 during the time of high burned area 
-7. Wind Speed variable stays between 3-5 km/hr that familiar cause of forest fire
+An analysis of the provided data points does not yield a strong evidence of any pattern of the relationship for the entire year. From the analysis above, we see that the fire season runs during August and September months with peak of activity on weekends (Friday, Saturday, Sunday). Though there seems to be a trend that shows maximum burned area during those months, we don't see a strong relationship between the key variables of interest.  
+
+Key relationship analysis for the months of August and September suggests that:  
+1. Fine Fuel Moisture Code (FFMC) value is greater than 80 during this time  
+2. Duff Moisture Code (DMC), Drought Code (DC) and high burned area is also positively correlated during the same time  
+3. Initial Spread Index (ISI) belongs to 5-15 range during this time, which can be another cause of forest fire.  
+5. On plotting high burned area versus temperature we see maximum burned area between temperature range of 15 to 25. This pattern is more evident when plotting against logarithmic scale of temperature  
+6. Relative humidity stays in the range of 40-50 during the time of high burned area   
+7. Wind Speed variable stays between 3-5 km/hr that familiar cause of forest fire  
 
 Secondary effects also show that that the top layer is dry for most months when substantial data is available. Summer months July, August and September are definitely dry. 
-There is not enough data for winter months to see a definite pattern. Data shows value of DC rising as summer approaches and peaks in the month of Aug and September. Flammability of deep organic layer is considered a reason for sustained forest fires.
+There is not enough data for winter months to see a definite pattern. Data shows value of DC rising as summer approaches and peaks in the month of Aug and September. Flammability of deep organic layer is considered a reason for sustained forest fires.  
 
-The provided sample size is not strong enough to generalize the relationship for a larger burned area as well. There could be other factors that can also cause forest fires and can influence the analysis provided they are available. An example are factors such as lightning, human factors like igniting of vegetation. 
+The provided sample size is not strong enough to generalize the relationship for a larger burned area as well. There could be other factors that can also cause forest fires and can influence the analysis provided they are available. An example are factors such as lightning, human factors like igniting of vegetation.  
 
 
